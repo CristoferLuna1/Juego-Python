@@ -4,12 +4,12 @@ import core.Animacion as Animacion
 class Player:
     def __init__(self, x, y):
         animaciones_rutas = {
-            'default': ("./data/sprites/Pink_Monster.png", 32, 32, 1),
-            'up': ("./data/sprites/monsterup.png", 32, 32, 4),
-            'down': ("./data/sprites/monsterdown.png", 32, 32, 4),
-            'left': ("./data/sprites/monsterizquierda.png", 32, 32, 6),
-            'right': ("./data/sprites/monsterderecha.png", 32, 32, 6),
-            'dash': ("./data/sprites/monsterdash.png", 32, 32, 6)
+            'default': ("./assets/sprites/Pink_Monster.png", 32, 32, 1),
+            'up': ("./assets/sprites/monsterup.png", 32, 32, 4),
+            'down': ("./assets/sprites/monsterdown.png", 32, 32, 4),
+            'left': ("./assets/sprites/monsterizquierda.png", 32, 32, 6),
+            'right': ("./assets/sprites/monsterderecha.png", 32, 32, 6),
+            'dash': ("./assets/sprites/monsterdash.png", 32, 32, 6)
         }
 
         self.animaciones = {
