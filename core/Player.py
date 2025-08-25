@@ -65,16 +65,18 @@ class Player:
         self.rect.center = self.pos
         self.frame_actual = self.animaciones[self.estado].update()
 
-def draw(self, surface, offset):
-    draw_pos = self.rect.topleft - offset
+    def draw(self, surface, offset):
+        draw_pos = (self.rect.topleft[0] - offset[0], self.rect.topleft[1] - offset[1])
 
-    # Si está en dash, dibuja la animación dash como "efecto extra"
-    if self.is_dashing:
-        dash_effect = self.animaciones['dash'].update()
-        dash_effect.set_alpha(120)  # semitransparente
-        surface.blit(dash_effect, draw_pos)  # atrás
+        # Si está en dash, dibuja la animación dash como "efecto extra"
+        if self.is_dashing and 'dash' in self.animaciones:
+            dash_effect = self.animaciones['dash'].update()
+            if dash_effect:  # Evita error si la animación terminó
+                dash_effect.set_alpha(120)  # semitransparente
+                surface.blit(dash_effect, draw_pos)  # detrás del jugador
 
-    # Siempre dibujar el personaje principal (movimiento normal)
-    surface.blit(self.frame_actual, draw_pos)
+        # Siempre dibujar el personaje principal
+        surface.blit(self.frame_actual, draw_pos)
+
 
 
