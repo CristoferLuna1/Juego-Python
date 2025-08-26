@@ -1,5 +1,6 @@
 import pygame
 import core.Animacion as Animacion
+from core.Bala import Bala
 
 class Player:
     def __init__(self, x, y):
@@ -77,6 +78,14 @@ class Player:
 
         # Siempre dibujar el personaje principal
         surface.blit(self.frame_actual, draw_pos)
+
+    def shoot(self, mouse_pos, offset):
+        # mouse_pos: posición del cursor en la pantalla
+        # offset: desplazamiento del mapa
+        start_pos = (self.pos.x, self.pos.y)
+        target_pos = (mouse_pos[0] + offset[0], mouse_pos[1] + offset[1])
+        bala = Bala(start_pos, target_pos)
+        return bala
 
 
 

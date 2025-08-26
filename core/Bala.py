@@ -1,22 +1,21 @@
 import pygame
 
 class Bala(pygame.sprite.Sprite):
-    def __init__(self, start_pos, direction, velocidad=20):
+    def __init__(self, start_pos, target_pos, velocidad=20):
         super().__init__()
-        self.image = pygame.Surface((15, 15))
-        self.image.fill("yellow")
-        self.rect = self.image.get_rect()
-        self.pos = pygame.Vector2(start_pos)  # Posición real en el mundo
-        self.rect.center = self.pos
-        self.direction = direction
+        self.image = pygame.Surface((10, 10))
+        self.image.fill((255, 255, 0))
+        self.rect = self.image.get_rect(center=start_pos)
+
+        self.pos = pygame.Vector2(start_pos)
+        direction = pygame.Vector2(target_pos) - self.pos
+        if direction.length() != 0:
+            self.direction = direction.normalize()
+        else:
+            self.direction = pygame.Vector2(0, 0)
         self.velocidad = velocidad
 
-    def update(self):
-        # Mueve la bala en el mundo
-        self.pos += self.direction * self.velocidad
-        self.rect.center = self.pos  # Actualiza el rect para colisiones
-
-    def draw(self, surface, offset):
-        # Dibuja la bala teniendo en cuenta el desplazamiento de la cámara
-        draw_pos = self.rect.topleft - offset
-        surface.blit(self.image, draw_pos)
+    def update(self, dt=1):
+        # Actualizamos posición sin límite
+        self.pos += self.direction * self.velocidad * dt
+        self.rect.center = self.pos
