@@ -30,6 +30,7 @@ class Player:
         self.rect = pygame.Rect(0, 0, self.width, self.height)
         self.rect.center = self.pos
         self.health = 100
+        self.bullets = 20
 
         # Velocidades
         self.base_speed = 300

@@ -54,7 +54,6 @@ def escuchar_servidor(all_players, cliente_id_container):
     while True:
         try:
             data = recv_pickle(cliente)
-            #print("Datos recibidos del servidor:", data)
             if data is None:
                 break
 

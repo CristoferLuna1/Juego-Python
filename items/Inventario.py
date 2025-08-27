@@ -6,10 +6,15 @@ class Inventario:
         self.item_text_cache = {}
         self.needs_redraw = True
         self.inventory_surface = None
+        self.visible = False   # 👈 Nuevo atributo
 
         # Crear fuentes una vez
         self.font_number = pygame.font.Font(None, 16)
         self.font_item = pygame.font.Font(None, 20)
+
+    def toggle(self):
+        """Muestra u oculta el inventario"""
+        self.visible = not self.visible
 
     def add_item(self, item):
         self.items.append(item)
@@ -60,6 +65,9 @@ class Inventario:
         self.needs_redraw = False
 
     def display_inventory(self, screen, x, y, item_size):
+        """Dibuja el inventario solo si está visible"""
+        if not self.visible:
+            return
         if self.needs_redraw or self.inventory_surface is None:
             self.render_inventory_surface(item_size)
 

@@ -52,7 +52,8 @@ class UI:
         # Dibujar un círculo pequeño como cursor personalizado
         pygame.draw.circle(screen, "Blue", (mouse_x, mouse_y), 20,10)
 
-    def draw_players(self, screen, font, all_players, local_player, offset):
+    #Dibujar otros jugadores
+    def draw_players(self, screen, font, all_players, local_player, offset, arma, balas_group):
         for pid, pdata in all_players.items():
             if not isinstance(pdata, dict):
                 continue
@@ -84,6 +85,12 @@ class UI:
             rect = nombre_texto.get_rect(center=(px, py - 40))
             screen.blit(nombre_texto, rect)
 
+            for b in pdata.get("balas", []):
+                bx = b.get("x", 0) - offset[0]
+                by = b.get("y", 0) - offset[1]
+                pygame.draw.circle(screen, ("Yellow"), (int(bx), int(by)), 10)
+                #caja de colisión
+                pygame.draw.rect(screen, (255, 0, 0), (bx - 5, by - 5, 10, 10), 1)
 
 
     def draw_hud(self,screen, font, player, clock, inventario, selected_item, count):
@@ -115,30 +122,43 @@ class UI:
         #Mostrar coordenadas:
         coordenadas_text = font.render(f"Coordenadas: {player.rect.x}, {player.rect.y}", True, (255, 255, 255))
         screen.blit(coordenadas_text, (20, 60))
-
+        #Contador de balas
+        if player.bullets > 0:
+            balas_text = font.render(f"Balas: {player.bullets}", True, (255, 255, 255))
+        else:
+            balas_text = font.render("Recarga con R", True, (255, 255, 255))
+        screen.blit(balas_text, (20, 100))
         # Inventario (barras abajo)
-        inv_y = screen.get_height() - 80
-        inv_x = 20
-        item_size = 50
+        inv_y = screen.get_height() - 100   # un poco más arriba
+        inv_x = 40                         # más margen izquierdo
+        item_size = 60                     # cuadros un poco más grandes
+        spacing = 20                       # espacio entre cuadros
+
         for i, item in enumerate(inventario.items):
-            rect = pygame.Rect(inv_x + i * (item_size + 10), inv_y, item_size, item_size)
+            rect = pygame.Rect(inv_x + i * (item_size + spacing), inv_y, item_size, item_size)
             color = (100, 100, 100)
             if i == selected_item:  # resaltar ítem seleccionado
                 color = (200, 200, 0)
-            pygame.draw.rect(screen, color, rect, border_radius=5)
+            pygame.draw.rect(screen, color, rect, border_radius=8)
 
-            # Nombre del ítem
-            item_text = font.render(item.name, True, (255, 255, 255))
-            screen.blit(item_text, (rect.x + 5, rect.y + 5))
+            # Texto del ítem → recortado a 4-5 caracteres para que no se encime
+            display_name = item.name[:5]  
+            item_text = font.render(display_name, True, (255, 255, 255))
+            text_rect = item_text.get_rect(center=rect.center)
+            screen.blit(item_text, text_rect)
 
-        # Cantidad del ítem seleccionado
+        # Cantidad del ítem seleccionado (debajo del slot resaltado)
         if 0 <= selected_item < len(inventario.items):
-            cant_text = font.render(f"x{count}", True, (255, 255, 255))
-            screen.blit(cant_text, (inv_x + selected_item * (item_size + 10), inv_y - 25))
+            cant_text = font.render(f"x{player.bullets}", True, (255, 255, 255))
+            cant_rect = cant_text.get_rect(
+                center=(inv_x + selected_item * (item_size + spacing) + item_size // 2, inv_y - 20)
+            )
+            screen.blit(cant_text, cant_rect)
 
 
 
-    def handle_events(self,event, player, inventario, balas_group, offset):
+
+    def handle_events(self,event, player, inventario, balas_group, offset,count):
         """
         Maneja los eventos de UI e interacción del jugador
         """
@@ -146,13 +166,17 @@ class UI:
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
-            # Abrir inventario
-            if event.key == pygame.K_i:
-                inventario.toggle()
-
         # Disparo con click izquierdo
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # Click izquierdo
-                bala = player.shoot(event.pos, offset)
-                if bala:
-                    balas_group.add(bala)
+                if player.bullets > 0:
+                    bala = player.shoot(event.pos, offset)
+                    if bala:
+                        balas_group.add(bala)
+                        player.bullets -= 1
+                else:
+                    print("Te has quedado sin balas")
+
+    def draw_recarga(self, screen, font):
+        recarga_text = font.render("Recarga con R", True, (255, 255, 255))
+        screen.blit(recarga_text, (20, 100))

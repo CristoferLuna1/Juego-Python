@@ -31,7 +31,7 @@ balas_group = pygame.sprite.Group()
 player_shield = shield.PlayerShield(player.rect.centerx, player.rect.centery)
 grid = Grid.Grid(2000, 2000, 32)
 ui = ui.UI(font, player_template.animaciones)
-arma = weapons.Weapon("Pistola", 10, 20)
+arma = weapons.Weapon(player,"Pistola", 10, 20)
 
 
 inventario = Inventario()
@@ -50,13 +50,19 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        ui.handle_events(event, player, inventario, balas_group, offset)
+        ui.handle_events(event, player, inventario, balas_group, offset,count)
         keys = pygame.key.get_pressed()
         if keys[pygame.K_ESCAPE]:
             running = False
+        if keys[pygame.K_v]:
+            player.bullets = 0
+        if event.type == pygame.KEYDOWN:
+            if keys[pygame.K_r]:
+                arma.start_reload()
 
     # -------- UPDATE -------- #
-    weapons.Bullet.update_balas(balas_group)
+    weapons.Bullet.update_balas(balas_group, dt=0.95)
+    arma.update()
     player_shield.update_position(player.rect.center)
     game_state.GameState.check_gameover(player)
     player.update(dt)
@@ -75,12 +81,12 @@ while running:
     # -------- DRAW -------- #
     screen.fill("black")
     ui.draw_cuadricula(player, screen, screen.get_width(), screen.get_height(), 120)
-    ui.draw_players(screen, font, all_players, player, offset)
-    arma.draw(balas_group, screen, offset)
+    ui.draw_players(screen, font, all_players, player, offset, arma, balas_group)
     player_shield.draw(screen, offset)
-    ui.draw_inventory(screen, inventario, selected_item)
+    #ui.draw_inventory(screen, inventario, selected_item)
     ui.draw_hud(screen, font, player, clock, inventario, selected_item, count)
     ui.draw_cursor(screen)
+    arma.draw_recarga(screen, font)
 
     pygame.display.flip()
     dt = clock.tick(60) / 1000
