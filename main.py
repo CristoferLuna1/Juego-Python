@@ -40,7 +40,7 @@ for nombre in ["Pistola", "Construir", "Escudo", "Pocion", "Llave", "Capa"]:
 
 running, dt = True, 0
 selected_item, count = 0, 20
-
+item_select = ""
 
 # ---------------- LOOP PRINCIPAL ---------------- #
 while running:
@@ -50,7 +50,7 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        ui.handle_events(event, player, inventario, balas_group, offset,count)
+        ui.handle_events(event, player, inventario.get_item(item_select), balas_group, offset,count)
         keys = pygame.key.get_pressed()
         if keys[pygame.K_ESCAPE]:
             running = False
@@ -59,13 +59,17 @@ while running:
         if event.type == pygame.KEYDOWN:
             if keys[pygame.K_r]:
                 arma.start_reload()
+            if keys[pygame.K_f]:
+                player_shield.activate_shield()
+            if keys[pygame.K_q]:
+                item_select = "Pistola"
 
     # -------- UPDATE -------- #
     weapons.Bullet.update_balas(balas_group, dt=0.95)
     arma.update()
-    player_shield.update_position(player.rect.center)
     game_state.GameState.check_gameover(player)
     player.update(dt)
+    player_shield.update((player.rect.centerx- offset[0], player.rect.centery - offset[1]))
     # -------- ENVIAR DATOS AL SERVER -------- #
     data = {
         'x': player.pos.x,
@@ -73,7 +77,8 @@ while running:
         'estado': player.estado,
         'is_dashing': player.is_dashing,
         'balas': [{'x': b.rect.x, 'y': b.rect.y} for b in balas_group],
-        'colisiones': []
+        'colisiones': [],
+        'escudo_activo': player_shield.active,
     }
     #print("Enviando datos al servidor:", data)
     send_pickle(cliente, data)
@@ -81,9 +86,7 @@ while running:
     # -------- DRAW -------- #
     screen.fill("black")
     ui.draw_cuadricula(player, screen, screen.get_width(), screen.get_height(), 120)
-    ui.draw_players(screen, font, all_players, player, offset, arma, balas_group)
-    player_shield.draw(screen, offset)
-    #ui.draw_inventory(screen, inventario, selected_item)
+    ui.draw_players(screen, font, all_players, player, offset, arma, balas_group, player_shield)
     ui.draw_hud(screen, font, player, clock, inventario, selected_item, count)
     ui.draw_cursor(screen)
     arma.draw_recarga(screen, font)

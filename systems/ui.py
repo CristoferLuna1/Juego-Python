@@ -53,7 +53,7 @@ class UI:
         pygame.draw.circle(screen, "Blue", (mouse_x, mouse_y), 20,10)
 
     #Dibujar otros jugadores
-    def draw_players(self, screen, font, all_players, local_player, offset, arma, balas_group):
+    def draw_players(self, screen, font, all_players, local_player, offset, arma, balas_group, player_shield):
         for pid, pdata in all_players.items():
             if not isinstance(pdata, dict):
                 continue
@@ -71,6 +71,11 @@ class UI:
             if all_players[pid].get("is_dashing", False):
                 estado_dash = self.player_animations.get("dash")
                 screen.blit(estado_dash.update(), rect)
+
+            if all_players[pid].get("escudo_activo", True):
+                screen.blit(player_shield.image, (px - player_shield.radius, py - player_shield.radius))
+            else:
+                player_shield.draw(font, screen)
             # Barra de vida
             vida_max = pdata.get("vida_max", 100)
             vida_actual = pdata.get("vida", 100)
@@ -158,10 +163,11 @@ class UI:
 
 
 
-    def handle_events(self,event, player, inventario, balas_group, offset,count):
+    def handle_events(self,event, player, inventario_item, balas_group, offset,count):
         """
         Maneja los eventos de UI e interacción del jugador
         """
+
         # Cerrar el juego
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -169,13 +175,16 @@ class UI:
         # Disparo con click izquierdo
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # Click izquierdo
-                if player.bullets > 0:
-                    bala = player.shoot(event.pos, offset)
-                    if bala:
-                        balas_group.add(bala)
-                        player.bullets -= 1
+                if inventario_item and inventario_item.name == "Pistola":
+                    if player.bullets > 0:
+                        bala = player.shoot(event.pos, offset)
+                        if bala:
+                            balas_group.add(bala)
+                            player.bullets -= 1
+                    else:
+                        print("Te has quedado sin balas")
                 else:
-                    print("Te has quedado sin balas")
+                    print("No tienes arma equipada")
 
     def draw_recarga(self, screen, font):
         recarga_text = font.render("Recarga con R", True, (255, 255, 255))
