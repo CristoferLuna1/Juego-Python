@@ -20,3 +20,7 @@ class Animacion:
         if self.inicio >= len(self.frames):
             self.inicio = 0
         return self.frames[int(self.inicio)]
+    def reset(self):
+        self.inicio = 0
+    def total_frames(self):
+        return len(self.frames)

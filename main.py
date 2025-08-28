@@ -63,12 +63,22 @@ while running:
                 player_shield.activate_shield()
             if keys[pygame.K_q]:
                 item_select = "Pistola"
+            if keys[pygame.K_e]:
+                item_select = "Construir"
+        if event.type == pygame.MOUSEWHEEL:
+            if event.y > 0:
+                selected_item = (selected_item - 1) % len(inventario.items)
+            elif event.y < 0:
+                selected_item = (selected_item + 1) % len(inventario.items)
+            if 0 <= selected_item < len(inventario.items):
+                item_select = inventario.items[selected_item].name
+                print("Ítem seleccionado:", item_select)
 
     # -------- UPDATE -------- #
     weapons.Bullet.update_balas(balas_group, dt=0.95)
     arma.update()
     game_state.GameState.check_gameover(player)
-    player.update(dt)
+    player.update(dt, event, inventario.get_item(item_select))
     player_shield.update((player.rect.centerx- offset[0], player.rect.centery - offset[1]))
     # -------- ENVIAR DATOS AL SERVER -------- #
     data = {

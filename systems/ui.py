@@ -93,8 +93,16 @@ class UI:
             for b in pdata.get("balas", []):
                 bx = b.get("x", 0) - offset[0]
                 by = b.get("y", 0) - offset[1]
-                pygame.draw.circle(screen, ("Yellow"), (int(bx), int(by)), 10)
-                #caja de colisión
+                local_player.estado = "piedra"
+                # Dibuja el sprite de la piedra si está disponible, si no, dibuja un círculo
+                piedra_sprite = self.player_animations.get("piedra")
+                if piedra_sprite:
+                    frame_piedra = piedra_sprite.update()
+                    rect_piedra = frame_piedra.get_rect(center=(int(bx), int(by)))
+                    screen.blit(frame_piedra, rect_piedra)
+                else:
+                    pygame.draw.circle(screen, ("Yellow"), (int(bx), int(by)), 10)
+                # caja de colisión
                 pygame.draw.rect(screen, (255, 0, 0), (bx - 5, by - 5, 10, 10), 1)
 
 
@@ -147,18 +155,18 @@ class UI:
             pygame.draw.rect(screen, color, rect, border_radius=8)
 
             # Texto del ítem → recortado a 4-5 caracteres para que no se encime
-            display_name = item.name[:5]  
+            display_name = item.name[:5]
             item_text = font.render(display_name, True, (255, 255, 255))
             text_rect = item_text.get_rect(center=rect.center)
             screen.blit(item_text, text_rect)
-
         # Cantidad del ítem seleccionado (debajo del slot resaltado)
         if 0 <= selected_item < len(inventario.items):
-            cant_text = font.render(f"x{player.bullets}", True, (255, 255, 255))
-            cant_rect = cant_text.get_rect(
-                center=(inv_x + selected_item * (item_size + spacing) + item_size // 2, inv_y - 20)
-            )
-            screen.blit(cant_text, cant_rect)
+            if(selected_item == 0):
+                cant_text = font.render(f"x{player.bullets}", True, (255, 255, 255))
+                cant_rect = cant_text.get_rect(
+                    center=(inv_x + selected_item * (item_size + spacing) + item_size // 2, inv_y - 20)
+                )
+                screen.blit(cant_text, cant_rect)
 
 
 
@@ -167,7 +175,6 @@ class UI:
         """
         Maneja los eventos de UI e interacción del jugador
         """
-
         # Cerrar el juego
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -176,14 +183,21 @@ class UI:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # Click izquierdo
                 if inventario_item and inventario_item.name == "Pistola":
-                    if player.bullets > 0:
+                    # Disparo con delay de 1 segundo entre balas
+                    current_time = pygame.time.get_ticks()
+                    if not hasattr(player, 'last_shot_time'):
+                        player.last_shot_time = 0
+                    if player.bullets > 0 and current_time - player.last_shot_time >= 300:
                         bala = player.shoot(event.pos, offset)
                         if bala:
                             balas_group.add(bala)
                             player.bullets -= 1
+                            player.last_shot_time = current_time
+                    elif player.bullets <= 0:
+                        print("Te has quedado sin balas")
                     else:
                         print("Te has quedado sin balas")
-                else:
+                elif inventario_item and inventario_item.name == "Construir":
                     print("No tienes arma equipada")
 
     def draw_recarga(self, screen, font):

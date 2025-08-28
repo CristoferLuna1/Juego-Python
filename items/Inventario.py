@@ -6,7 +6,7 @@ class Inventario:
         self.item_text_cache = {}
         self.needs_redraw = True
         self.inventory_surface = None
-        self.visible = False   # 👈 Nuevo atributo
+        self.visible = False
 
         # Crear fuentes una vez
         self.font_number = pygame.font.Font(None, 16)
