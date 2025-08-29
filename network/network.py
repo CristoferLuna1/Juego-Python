@@ -3,15 +3,29 @@ import socket
 import struct
 
 
+
 # Dirección IP y puerto del servidor al que se conectará el cliente
-IP_SERVIDOR = "192.168.1.202"
+def get_server_address():
+     # Crear un socket TCP/IP
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(("8.8.8.8", 80))
+        IP_LOCAL = s.getsockname()[0]
+    except Exception as e:
+        print(f"Error al conectar con el servidor: {e}")
+        IP_LOCAL = "127.0.0.1"  #"192.168.1.202"
+    finally:
+        s.close()
+    return IP_LOCAL
+
+
+IP_SERVIDOR = get_server_address()
 PUERTO = 1313
 
-# Crear un socket TCP/IP
-cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# Conectar el socket al servidor
-cliente.connect((IP_SERVIDOR, PUERTO))
 
+# Conectar el socket al servidor
+cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+cliente.connect((IP_SERVIDOR, PUERTO))
 def recv_pickle(sock):
     # Primero recibimos 4 bytes con el tamaño
     raw_msglen = recvall(sock, 4)

@@ -69,7 +69,7 @@ class UI:
                 rect = frame.get_rect(center=(px, py))
                 screen.blit(frame, rect)
             if all_players[pid].get("is_dashing", False):
-                estado_dash = self.player_animations.get("dash")
+                estado_dash = self.player_animations.get("dashderecha")
                 screen.blit(estado_dash.update(), rect)
 
             if all_players[pid].get("escudo_activo", True):

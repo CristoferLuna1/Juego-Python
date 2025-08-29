@@ -10,10 +10,11 @@ class Player:
             'down': ("./assets/sprites/monsterdown.png", 32, 32, 4),
             'left': ("./assets/sprites/monsterizquierda.png", 32, 32, 6),
             'right': ("./assets/sprites/monsterderecha.png", 32, 32, 6),
-            'dash': ("./assets/sprites/monsterdash.png", 32, 32, 6),
+            'dashderecha': ("./assets/sprites/monsterdash.png", 32, 32, 6),
+            #'dashizquierda': ("./assets/sprites/monsterdashizquierda.png", 32, 32, 6),
             'ataque': ("./assets/sprites/lanzarpiedraderecha.png", 32, 32, 4),
-            "ataqueizquierda" : ("./assets/sprites/lanzarpiedraizquierda.png", 32, 32, 4),
-            "piedra" : ("./assets/sprites/piedra.png", 16, 16, 1)
+            'ataqueizquierda': ("./assets/sprites/lanzarpiedraizquierda.png", 32, 32, 4),
+            'piedra': ("./assets/sprites/piedra.png", 16, 16, 1)
         }
 
         self.animaciones = {
@@ -115,8 +116,8 @@ class Player:
         draw_pos = (self.rect.topleft[0] - offset[0], self.rect.topleft[1] - offset[1])
 
         # Si está en dash, dibuja la animación dash como "efecto extra"
-        if self.is_dashing and 'dash' in self.animaciones:
-            dash_effect = self.animaciones['dash'].update()
+        if self.is_dashing and 'dashderecha' in self.animaciones:
+            dash_effect = self.animaciones['dashderecha'].update()
             if dash_effect:  # Evita error si la animación terminó
                 dash_effect.set_alpha(120)  # semitransparente
                 surface.blit(dash_effect, draw_pos)  # detrás del jugador

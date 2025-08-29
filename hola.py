@@ -98,7 +98,7 @@ while running:
             velocidad = 10
             if x > 1280:
                 x = 0
-            actual = animaciones['dash'].update()
+            actual = animaciones['dashderecha'].update()
             screen.blit(actual, (x, y))
 
     else:
